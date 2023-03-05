@@ -112,11 +112,12 @@ function dragDropEvents(board) {
     const target = e.target;
     if (target.tagName === 'INPUT') {
       // console.log(target.getBoundingClientRect());
-      const { top, bottom } = target.getBoundingClientRect();
-      console.log(e.clientY);
-      if (e.clientY >= bottom || e.clientY < top) {
-        target.closest('li').classList.remove('over');
-      }
+      target.closest('li').classList.remove('over');
+      // const { top, bottom } = target.getBoundingClientRect();
+
+      // if (e.clientY >= bottom || e.clientY < top) {
+
+      // }
     }
   });
 
