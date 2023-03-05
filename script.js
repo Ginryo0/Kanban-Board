@@ -161,30 +161,6 @@ function dragDropEvents(board) {
 
       draggedItem.remove();
 
-      // Dropped Element Event Listeners
-      droppedItem
-        .getElementsByClassName('btn remove')[0]
-        .addEventListener(
-          'click',
-          removeTaskElement.bind(
-            null,
-            endBoardIdx,
-            draggedItemIdx + 1,
-            droppedItem
-          )
-        );
-
-      droppedItem
-        .getElementsByClassName('btn edit')[0]
-        .addEventListener('click', editTaskInput.bind(null, droppedItem));
-
-      const input = droppedItem.getElementsByClassName('input')[0];
-
-      input.addEventListener(
-        'blur',
-        disabledOnBlur.bind(null, input, endBoardIdx, droppedItemIdx)
-      );
-
       if (e.target.tagName === 'INPUT') {
         // Finding dropping Idx
         droppedItemIdx = [
@@ -220,6 +196,31 @@ function dragDropEvents(board) {
           JSON.stringify(boardsStorage[endBoardIdx])
         );
       }
+
+      // Dropped Element Event Listeners
+      droppedItem
+        .getElementsByClassName('btn remove')[0]
+        .addEventListener(
+          'click',
+          removeTaskElement.bind(
+            null,
+            endBoardIdx,
+            draggedItemIdx + 1,
+            droppedItem
+          )
+        );
+
+      droppedItem
+        .getElementsByClassName('btn edit')[0]
+        .addEventListener('click', editTaskInput.bind(null, droppedItem));
+
+      const input = droppedItem.getElementsByClassName('input')[0];
+      console.log(droppedItemIdx);
+
+      input.addEventListener(
+        'blur',
+        disabledOnBlur.bind(null, input, endBoardIdx, draggedItemIdx || 0)
+      );
     }
   });
 }
