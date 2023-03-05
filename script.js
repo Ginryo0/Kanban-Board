@@ -101,6 +101,7 @@ function dragDropEvents(board) {
   // Drag Enter
   boardList.addEventListener('dragenter', (e) => {
     const target = e.target;
+    console.log('enter');
     if (e.target.tagName === 'INPUT') {
       target.closest('li').classList.add('over');
     }
@@ -109,8 +110,13 @@ function dragDropEvents(board) {
   // Drag Leave
   boardList.addEventListener('dragleave', (e) => {
     const target = e.target;
-    if (e.target.tagName === 'INPUT') {
-      target.closest('li').classList.remove('over');
+    if (target.tagName === 'INPUT') {
+      // console.log(target.getBoundingClientRect());
+      const { top, bottom } = target.getBoundingClientRect();
+      console.log(e.clientY);
+      if (e.clientY >= bottom || e.clientY < top) {
+        target.closest('li').classList.remove('over');
+      }
     }
   });
 
