@@ -126,14 +126,26 @@ function dragDropEvents(board) {
     let endBoardIdx;
     let droppedItemIdx;
     let droppedItem;
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'UL') {
+    let draggedItem = boardsArr[startBoardIdx]
+      .getElementsByTagName('ul')[0]
+      .getElementsByTagName('li')[draggedItemIdx];
+
+    let liEl;
+
+    // Removing hover class
+    if (e.target.tagName === 'INPUT') {
+      liEl = e.target.closest('li');
+      liEl.classList.remove('over');
+    }
+
+    if (
+      (e.target.tagName === 'INPUT' &&
+        e.target.closest('li') !== draggedItem) ||
+      e.target.tagName === 'UL'
+    ) {
       endBoardIdx = boardsArr.findIndex(
         (board) => board === e.currentTarget.closest('div')
       );
-
-      let draggedItem = boardsArr[startBoardIdx]
-        .getElementsByTagName('ul')[0]
-        .getElementsByTagName('li')[draggedItemIdx];
 
       droppedItem = draggedItem.cloneNode(true);
 
@@ -162,45 +174,42 @@ function dragDropEvents(board) {
       droppedItem
         .getElementsByClassName('btn edit')[0]
         .addEventListener('click', editTaskInput.bind(null, droppedItem));
-    }
-    if (e.target.tagName === 'INPUT') {
-      // Removing hover class
-      const liEl = e.target.closest('li');
-      liEl.classList.remove('over');
 
-      // Finding dropping Idx
-      droppedItemIdx = [
-        ...e.currentTarget.getElementsByTagName('li'),
-      ].findIndex((el) => el === liEl);
-      boardsStorage[endBoardIdx].splice(
-        droppedItemIdx + 1,
-        0,
-        droppedItem.getElementsByClassName('input')[0].value
-      );
+      if (e.target.tagName === 'INPUT') {
+        // Finding dropping Idx
+        droppedItemIdx = [
+          ...e.currentTarget.getElementsByTagName('li'),
+        ].findIndex((el) => el === liEl);
+        boardsStorage[endBoardIdx].splice(
+          droppedItemIdx + 1,
+          0,
+          droppedItem.getElementsByClassName('input')[0].value
+        );
 
-      // Updating Local Storage
-      localStorage.setItem(
-        boardsShort[endBoardIdx],
-        JSON.stringify(boardsStorage[endBoardIdx])
-      );
+        // Updating Local Storage
+        localStorage.setItem(
+          boardsShort[endBoardIdx],
+          JSON.stringify(boardsStorage[endBoardIdx])
+        );
 
-      // Inserting element
-      liEl.insertAdjacentElement('afterend', droppedItem);
-    } else if (e.target.tagName === 'UL') {
-      // Append li to List
-      e.target.append(droppedItem);
+        // Inserting element
+        liEl.insertAdjacentElement('afterend', droppedItem);
+      } else if (e.target.tagName === 'UL') {
+        // Append li to List
+        e.target.append(droppedItem);
 
-      // Update Local Storage
-      boardsStorage[endBoardIdx].splice(
-        0,
-        0,
-        droppedItem.getElementsByClassName('input')[0].value
-      );
+        // Update Local Storage
+        boardsStorage[endBoardIdx].splice(
+          0,
+          0,
+          droppedItem.getElementsByClassName('input')[0].value
+        );
 
-      localStorage.setItem(
-        boardsShort[endBoardIdx],
-        JSON.stringify(boardsStorage[endBoardIdx])
-      );
+        localStorage.setItem(
+          boardsShort[endBoardIdx],
+          JSON.stringify(boardsStorage[endBoardIdx])
+        );
+      }
     }
   });
 }

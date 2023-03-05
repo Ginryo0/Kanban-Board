@@ -67,7 +67,25 @@ h2 {
   margin-bottom: 1rem;
   width: 100%;
   z-index: 1;
-  transition: all 0.2s ease-in;
+  transition: all 0.15s ease-in;
+}
+
+li .btn:hover {
+  opacity: 100%;
+}
+
+li.over {
+  margin-bottom: 1.5rem;
+}
+
+li.over::after {
+  content: '';
+  width: 100%;
+  height: 1.53rem;
+  background-color: rgba(0, 0, 0, 0.212);
+  display: block;
+  position: absolute;
+  transition: all 0.15s ease-in;
 }
 
 .input {
@@ -114,23 +132,6 @@ h2 {
   color: rgb(68, 68, 228);
   opacity: 50%;
   transition: opacity 0.2s ease-in-out;
-}
-
-li .btn:hover {
-  opacity: 100%;
-}
-
-li.over {
-  margin-bottom: 1.5rem;
-}
-
-li.over::after {
-  content: '';
-  width: 100%;
-  height: 1.53rem;
-  background-color: rgba(0, 0, 0, 0.212);
-  display: block;
-  position: absolute;
 }
 
 .btn--big {
