@@ -17,6 +17,7 @@ function disabledOnBlur(input, listNum, liNum) {
   input.disabled = true;
   const boardStore = boardsStorage[listNum];
   boardStore[liNum] = input.value;
+  console.log(liNum, boardStore);
   localStorage.setItem(boardsShort[listNum], JSON.stringify(boardStore));
 }
 
@@ -75,7 +76,6 @@ function removeTaskElement(listNum, liNum, li) {
 // Editing Task Input Field
 function editTaskInput(li) {
   const input = li.getElementsByClassName('input')[0];
-
   input.disabled = false;
   const end = input.value.length;
   input.setSelectionRange(end, end);
@@ -182,12 +182,11 @@ function dragDropEvents(board) {
         liEl.insertAdjacentElement('afterend', droppedItem);
       } else if (e.target.tagName === 'UL') {
         // Append li to List
+        console.log('UL');
         e.target.append(droppedItem);
 
         // Update Local Storage
-        boardsStorage[endBoardIdx].splice(
-          0,
-          0,
+        boardsStorage[endBoardIdx].push(
           droppedItem.getElementsByClassName('input')[0].value
         );
 
@@ -205,7 +204,7 @@ function dragDropEvents(board) {
           removeTaskElement.bind(
             null,
             endBoardIdx,
-            draggedItemIdx + 1,
+            droppedItemIdx + 1,
             droppedItem
           )
         );
@@ -219,8 +218,10 @@ function dragDropEvents(board) {
 
       input.addEventListener(
         'blur',
-        disabledOnBlur.bind(null, input, endBoardIdx, draggedItemIdx || 0)
+        disabledOnBlur.bind(null, input, endBoardIdx, droppedItemIdx + 1 || 0)
       );
+
+      console.log(boardsStorage[endBoardIdx]);
     }
   });
 }
