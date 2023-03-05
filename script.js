@@ -12,6 +12,14 @@ const boardsStorage = [nsBoard, ipBoard, cmpBoard];
 let startBoardIdx;
 let draggedItemIdx;
 
+// Disable on Blur
+function disabledOnBlur(input, listNum, liNum) {
+  input.disabled = true;
+  const boardStore = boardsStorage[listNum];
+  boardStore[liNum] = input.value;
+  localStorage.setItem(boardsShort[listNum], JSON.stringify(boardStore));
+}
+
 // Creating task LI
 function createTaskEl(listN, liN, txt = 'New Task') {
   const board = boardsArr[listN];
@@ -27,11 +35,7 @@ function createTaskEl(listN, liN, txt = 'New Task') {
 
   const input = liEl.getElementsByClassName('input')[0];
   input.addEventListener('blur', () => {
-    input.disabled = true;
-    const boardStore = boardsStorage[listN];
-    boardStore[liN] = input.value;
-    console.log(boardStore);
-    localStorage.setItem(boardsShort[listN], JSON.stringify(boardStore));
+    disabledOnBlur(input, listN, liN);
   });
 
   // Adding Edit Btn
@@ -101,7 +105,6 @@ function dragDropEvents(board) {
   // Drag Enter
   boardList.addEventListener('dragenter', (e) => {
     const target = e.target;
-    console.log('enter');
     if (e.target.tagName === 'INPUT') {
       target.closest('li').classList.add('over');
     }
@@ -174,6 +177,13 @@ function dragDropEvents(board) {
       droppedItem
         .getElementsByClassName('btn edit')[0]
         .addEventListener('click', editTaskInput.bind(null, droppedItem));
+
+      const input = droppedItem.getElementsByClassName('input')[0];
+
+      input.addEventListener(
+        'blur',
+        disabledOnBlur.bind(null, input, endBoardIdx, droppedItemIdx)
+      );
 
       if (e.target.tagName === 'INPUT') {
         // Finding dropping Idx
