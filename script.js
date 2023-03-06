@@ -306,8 +306,8 @@ function dragDropTouchEvents(board) {
 
   board.addEventListener('touchend', (e) => {
     if (
-      (endBoardIdx >= 0 && endBoardIdx !== startBoardIdx) ||
-      droppedItemIdx !== draggedItemIdx
+      endBoardIdx >= 0 &&
+      (endBoardIdx !== startBoardIdx || droppedItemIdx !== draggedItemIdx)
     ) {
       // console.log(endBoardIdx, droppedItemIdx);
       if (droppedItemIdx >= 0) {
