@@ -11,7 +11,7 @@
 }
 
 body {
-  padding: 10rem 10rem 0;
+  padding: 5rem 5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -22,7 +22,7 @@ body {
   min-height: 100vh;
   min-width: 100vw;
   font-size: 62.5%;
-  margin: 1rem;
+  text-align: center;
 }
 
 main {
@@ -35,6 +35,7 @@ main {
 }
 
 h1 {
+  /* margin: 0 auto; */
   font-weight: 600;
   font-size: 4rem;
   margin-bottom: 2rem;
@@ -47,7 +48,7 @@ h2 {
 }
 
 .board {
-  width: 20rem;
+  min-width: 20rem;
   max-width: 30vw;
 }
 
