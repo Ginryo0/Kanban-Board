@@ -82,20 +82,29 @@ function editTaskInput(li) {
   input.focus();
 }
 
+// Drag Start func
+function dragStart(e) {
+  let targ;
+  if (e.target.tagName === 'LI') {
+    targ = e.target;
+  } else if (e.target.tagName === 'INPUT') {
+    targ = e.target.closest('li');
+    console.log(targ);
+  }
+  startBoardIdx = boardsArr.findIndex(
+    (board) => board === e.currentTarget.closest('div')
+  );
+
+  draggedItemIdx = [...e.currentTarget.getElementsByTagName('li')].findIndex(
+    (el) => el === targ
+  );
+}
 // Adding Event Listeners
 function dragDropEvents(board) {
   const boardList = board.getElementsByClassName('list')[0];
 
   // Drag Start event -> dragged item
-  boardList.addEventListener('dragstart', (e) => {
-    startBoardIdx = boardsArr.findIndex(
-      (board) => board === e.currentTarget.closest('div')
-    );
-
-    draggedItemIdx = [...e.currentTarget.getElementsByTagName('li')].findIndex(
-      (el) => el === e.target
-    );
-  });
+  boardList.addEventListener('dragstart', dragStart);
 
   // Drag Over
   boardList.addEventListener('dragover', (e) => {
@@ -114,13 +123,7 @@ function dragDropEvents(board) {
   boardList.addEventListener('dragleave', (e) => {
     const target = e.target;
     if (target.tagName === 'INPUT') {
-      // console.log(target.getBoundingClientRect());
       target.closest('li').classList.remove('over');
-      // const { top, bottom } = target.getBoundingClientRect();
-
-      // if (e.clientY >= bottom || e.clientY < top) {
-
-      // }
     }
   });
 
@@ -226,6 +229,30 @@ function dragDropEvents(board) {
   });
 }
 
+function print() {
+  console.log(this);
+}
+// Enabling drag and drop on touch devices
+function dragDropTouchEvents(board) {
+  const boardList = board.getElementsByClassName('list')[0];
+
+  boardList.addEventListener('touchstart', dragStart);
+
+  board.addEventListener('touchend', (e) => {
+    console.log(e);
+    console.log('end');
+  });
+
+  board.addEventListener('touchmove', (e) => {
+    console.log(e.changedTouches);
+    const liEls = [...document.querySelectorAll('li')];
+    if (e.changedTouches[0].target.tagName === 'INPUT') {
+      liEls.forEach((li) => li.classList.remove('over'));
+      e.changedTouches[0].target.closest('li').classList.add('over');
+    }
+  });
+}
+
 function app() {
   // Loop through all boards
   for (let i = 0; i < boardsArr.length; i++) {
@@ -260,6 +287,7 @@ function app() {
 
     // Add Drag & Drop Event Listeners
     dragDropEvents(board);
+    dragDropTouchEvents(board);
   }
 }
 
