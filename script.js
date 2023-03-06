@@ -319,66 +319,70 @@ function dragDropTouchEvents(board) {
   });
 
   board.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-    const currY = e.changedTouches[0].clientY;
-    const currX = e.changedTouches[0].clientX;
-    // console.log(e.changedTouches[0].clientY);
+    // console.log(e.changedTouches[0].target.tagName === 'INPUT');
+    if (e.changedTouches[0].target.tagName === 'INPUT') {
+      e.preventDefault();
+      const currY = e.changedTouches[0].clientY;
+      const currX = e.changedTouches[0].clientX;
+      // console.log(e.changedTouches[0].clientY);
 
-    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+      const { scrollTop, scrollHeight, clientHeight } =
+        document.documentElement;
 
-    // console.log(scrollTop, clientHeight);
-    // console.log(Math.abs((scrollHeight - scrollTop) % clientHeight));
-    // console.log(
-    //   Math.abs(clientHeight - (scrollTop % clientHeight)) >= clientHeight - 60
-    // );
-    if (currY + 40 >= clientHeight) {
-      window.scrollBy({
-        top: 20,
-        behavior: 'smooth',
+      // console.log(scrollTop, clientHeight);
+      // console.log(Math.abs((scrollHeight - scrollTop) % clientHeight));
+      // console.log(
+      //   Math.abs(clientHeight - (scrollTop % clientHeight)) >= clientHeight - 60
+      // );
+      if (currY + 40 >= clientHeight) {
+        window.scrollBy({
+          top: 20,
+          behavior: 'smooth',
+        });
+      } else if (currY <= 40) {
+        window.scrollBy({
+          top: -20,
+          behavior: 'smooth',
+        });
+      }
+
+      // Calculting lists dimensions
+      const rects = [];
+      const lists = [...document.getElementsByTagName('ul')];
+      lists.forEach((list) => rects.push(list.getBoundingClientRect()));
+
+      // Current list Idx
+      const idx = rects.findIndex((rect) => {
+        return (
+          currY >= rect.top &&
+          currY <= rect.bottom &&
+          currX >= rect.left &&
+          currY <= rect.right
+        );
       });
-    } else if (currY <= 40) {
-      window.scrollBy({
-        top: -20,
-        behavior: 'smooth',
-      });
-    }
 
-    // Calculting lists dimensions
-    const rects = [];
-    const lists = [...document.getElementsByTagName('ul')];
-    lists.forEach((list) => rects.push(list.getBoundingClientRect()));
+      let liEls;
+      // Current li Idx
+      let liIdx;
+      if (idx >= 0) {
+        liEls = [...lists[idx].getElementsByTagName('li')];
+        liIdx = liEls.findIndex((el) => {
+          const { top, bottom } = el.getBoundingClientRect();
+          return currY >= top && currY <= bottom + 10;
+        });
+      }
 
-    // Current list Idx
-    const idx = rects.findIndex((rect) => {
-      return (
-        currY >= rect.top &&
-        currY <= rect.bottom &&
-        currX >= rect.left &&
-        currY <= rect.right
-      );
-    });
+      // console.log(idx, liIdx);
+      const allLis = [...document.getElementsByTagName('li')];
 
-    let liEls;
-    // Current li Idx
-    let liIdx;
-    if (idx >= 0) {
-      liEls = [...lists[idx].getElementsByTagName('li')];
-      liIdx = liEls.findIndex((el) => {
-        const { top, bottom } = el.getBoundingClientRect();
-        return currY >= top && currY <= bottom + 10;
-      });
-    }
-
-    // console.log(idx, liIdx);
-    const allLis = [...document.getElementsByTagName('li')];
-
-    // console.log(liIdx);
-    if (e.target.tagName === 'INPUT') {
-      if (liIdx !== droppedItemIdx) {
-        endBoardIdx = idx;
-        droppedItemIdx = liIdx;
-        allLis.forEach((li) => li.classList.remove('over'));
-        if (liIdx >= 0) liEls[liIdx].classList.add('over');
+      // console.log(liIdx);
+      if (e.target.tagName === 'INPUT') {
+        if (liIdx !== droppedItemIdx) {
+          endBoardIdx = idx;
+          droppedItemIdx = liIdx;
+          allLis.forEach((li) => li.classList.remove('over'));
+          if (liIdx >= 0) liEls[liIdx].classList.add('over');
+        }
       }
     }
   });
