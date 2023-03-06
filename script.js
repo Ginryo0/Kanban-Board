@@ -305,12 +305,13 @@ function dragDropTouchEvents(board) {
   boardList.addEventListener('touchstart', dragStart);
 
   board.addEventListener('touchend', (e) => {
+    console.log(endBoardIdx, droppedItemIdx);
     if (e.target.tagName === 'INPUT') {
       if (
         endBoardIdx >= 0 &&
         (endBoardIdx !== startBoardIdx || droppedItemIdx !== draggedItemIdx)
       ) {
-        // console.log(endBoardIdx, droppedItemIdx);
+        console.log('working');
         if (droppedItemIdx >= 0) {
           touchDrop('INPUT');
         } else {
@@ -320,12 +321,12 @@ function dragDropTouchEvents(board) {
     }
   });
 
-  board.addEventListener('touchcancel', () => {
-    startBoardIdx = null;
-    draggedItemIdx = null;
-    droppedItemIdx = null;
-    endBoardIdx = null;
-  });
+  // board.addEventListener('touchcancel', () => {
+  //   startBoardIdx = null;
+  //   draggedItemIdx = null;
+  //   droppedItemIdx = null;
+  //   endBoardIdx = null;
+  // });
   board.addEventListener('touchmove', (e) => {
     // console.log(e.changedTouches[0].target.tagName === 'INPUT');
     if (e.changedTouches[0].target.tagName === 'INPUT') {
@@ -361,11 +362,13 @@ function dragDropTouchEvents(board) {
 
       // Current list Idx
       const idx = rects.findIndex((rect) => {
+        console.log(currX, currY);
+        console.log(rect);
         return (
           currY >= rect.top &&
           currY <= rect.bottom &&
           currX >= rect.left &&
-          currY <= rect.right
+          currX <= rect.right
         );
       });
 
@@ -387,9 +390,14 @@ function dragDropTouchEvents(board) {
       if (e.target.tagName === 'INPUT') {
         if (liIdx !== droppedItemIdx) {
           endBoardIdx = idx;
-          droppedItemIdx = liIdx;
           allLis.forEach((li) => li.classList.remove('over'));
-          if (liIdx >= 0) liEls[liIdx].classList.add('over');
+          if (
+            liIdx >= 0 &&
+            (startBoardIdx !== endBoardIdx || liIdx !== draggedItemIdx)
+          ) {
+            liEls[liIdx].classList.add('over');
+            droppedItemIdx = liIdx;
+          }
         }
       }
     }
