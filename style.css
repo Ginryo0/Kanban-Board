@@ -11,7 +11,6 @@
 }
 
 body {
-  padding: 5rem 5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -35,7 +34,6 @@ main {
 }
 
 h1 {
-  /* margin: 0 auto; */
   font-weight: 600;
   font-size: 4rem;
   margin-bottom: 2rem;
@@ -148,4 +146,13 @@ li.over::after {
 
 .btn--big:hover {
   background-color: rgba(0, 0, 0, 0.45);
+}
+
+@media (max-width: 75em) {
+  html {
+    font-size: 81.25%;
+  }
+  body {
+    padding: 5rem;
+  }
 }
