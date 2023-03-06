@@ -330,14 +330,14 @@ function dragDropTouchEvents(board) {
       const { scrollTop, scrollHeight, clientHeight } =
         document.documentElement;
 
-      if (currY + 40 >= clientHeight) {
+      if (currY + 100 >= clientHeight) {
         window.scrollBy({
-          top: 20,
+          top: 50,
           behavior: 'smooth',
         });
-      } else if (currY <= 40) {
+      } else if (currY <= 100) {
         window.scrollBy({
-          top: -20,
+          top: -50,
           behavior: 'smooth',
         });
       }
