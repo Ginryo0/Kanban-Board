@@ -106,11 +106,15 @@ function dragStart(e) {
 
 // Drop func
 function touchDrop(target) {
-  let droppedItem;
+  lists.forEach((list) =>
+    [...list.getElementsByTagName('li')].forEach((li) =>
+      li.classList.remove('over')
+    )
+  );
   let draggedItem =
     lists[startBoardIdx].getElementsByTagName('li')[draggedItemIdx];
 
-  droppedItem = draggedItem.cloneNode(true);
+  let droppedItem = draggedItem.cloneNode(true);
   // console.log(droppedItem);
 
   boardsStorage[startBoardIdx].splice(draggedItemIdx, 1);
@@ -121,13 +125,13 @@ function touchDrop(target) {
   );
 
   if (target === 'INPUT') {
-    let liEl = lists[endBoardIdx].getElementsByTagName('li')[draggedItemIdx];
+    console.log(droppedItemIdx);
+    let liEl = lists[endBoardIdx].getElementsByTagName('li')[droppedItemIdx];
     boardsStorage[endBoardIdx].splice(
       droppedItemIdx + 1,
       0,
       droppedItem.getElementsByClassName('input')[0].value
     );
-    console.log(liEl);
 
     // Updating Local Storage
     localStorage.setItem(
@@ -305,13 +309,11 @@ function dragDropTouchEvents(board) {
   boardList.addEventListener('touchstart', dragStart);
 
   board.addEventListener('touchend', (e) => {
-    console.log(endBoardIdx, droppedItemIdx);
     if (e.target.tagName === 'INPUT') {
       if (
         endBoardIdx >= 0 &&
         (endBoardIdx !== startBoardIdx || droppedItemIdx !== draggedItemIdx)
       ) {
-        console.log('working');
         if (droppedItemIdx >= 0) {
           touchDrop('INPUT');
         } else {
@@ -376,27 +378,30 @@ function dragDropTouchEvents(board) {
       // Current li Idx
       let liIdx;
       if (idx >= 0) {
+        endBoardIdx = idx;
         liEls = [...lists[idx].getElementsByTagName('li')];
+        console.log(lists[idx].getElementsByTagName('li'));
         liIdx = liEls.findIndex((el) => {
+          console.log(el);
           const { top, bottom } = el.getBoundingClientRect();
           return currY >= top && currY <= bottom + 10;
         });
       }
 
+      console.log(liIdx);
       // console.log(idx, liIdx);
       const allLis = [...document.getElementsByTagName('li')];
 
       // console.log(liIdx);
       if (e.target.tagName === 'INPUT') {
         if (liIdx !== droppedItemIdx) {
-          endBoardIdx = idx;
           allLis.forEach((li) => li.classList.remove('over'));
+          droppedItemIdx = liIdx;
           if (
             liIdx >= 0 &&
             (startBoardIdx !== endBoardIdx || liIdx !== draggedItemIdx)
           ) {
             liEls[liIdx].classList.add('over');
-            droppedItemIdx = liIdx;
           }
         }
       }
