@@ -1,5 +1,5 @@
 const boards = document.getElementsByClassName('board');
-
+const lists = [...document.getElementsByTagName('ul')];
 const boardsArr = [...boards];
 const boardsShort = ['ns', 'ip', 'cmp'];
 
@@ -12,12 +12,15 @@ const boardsStorage = [nsBoard, ipBoard, cmpBoard];
 let startBoardIdx;
 let draggedItemIdx;
 
+let endBoardIdx;
+let droppedItemIdx;
+
 // Disable on Blur
 function disabledOnBlur(input, listNum, liNum) {
   input.disabled = true;
   const boardStore = boardsStorage[listNum];
   boardStore[liNum] = input.value;
-  console.log(liNum, boardStore);
+  // console.log(liNum, boardStore);
   localStorage.setItem(boardsShort[listNum], JSON.stringify(boardStore));
 }
 
@@ -89,15 +92,88 @@ function dragStart(e) {
     targ = e.target;
   } else if (e.target.tagName === 'INPUT') {
     targ = e.target.closest('li');
-    console.log(targ);
+    // console.log(targ);
   }
-  startBoardIdx = boardsArr.findIndex(
-    (board) => board === e.currentTarget.closest('div')
+
+  if (targ) {
+    startBoardIdx = lists.findIndex((list) => list === targ.closest('ul'));
+
+    draggedItemIdx = [...e.currentTarget.getElementsByTagName('li')].findIndex(
+      (el) => el === targ
+    );
+  }
+}
+
+// Drop func
+function touchDrop(target) {
+  let droppedItem;
+  let draggedItem =
+    lists[startBoardIdx].getElementsByTagName('li')[draggedItemIdx];
+
+  droppedItem = draggedItem.cloneNode(true);
+  // console.log(droppedItem);
+
+  boardsStorage[startBoardIdx].splice(draggedItemIdx, 1);
+
+  localStorage.setItem(
+    boardsShort[startBoardIdx],
+    JSON.stringify(boardsStorage[startBoardIdx])
   );
 
-  draggedItemIdx = [...e.currentTarget.getElementsByTagName('li')].findIndex(
-    (el) => el === targ
+  if (target === 'INPUT') {
+    let liEl = lists[endBoardIdx].getElementsByTagName('li')[draggedItemIdx];
+    boardsStorage[endBoardIdx].splice(
+      droppedItemIdx + 1,
+      0,
+      droppedItem.getElementsByClassName('input')[0].value
+    );
+    console.log(liEl);
+
+    // Updating Local Storage
+    localStorage.setItem(
+      boardsShort[endBoardIdx],
+      JSON.stringify(boardsStorage[endBoardIdx])
+    );
+
+    // Inserting element
+    liEl.insertAdjacentElement('afterend', droppedItem);
+  } else if (target === 'UL') {
+    // Append li to List
+    console.log(endBoardIdx);
+    console.log(lists[endBoardIdx]);
+    lists[endBoardIdx].append(droppedItem);
+
+    // Update Local Storage
+    boardsStorage[endBoardIdx].push(
+      droppedItem.getElementsByClassName('input')[0].value
+    );
+
+    localStorage.setItem(
+      boardsShort[endBoardIdx],
+      JSON.stringify(boardsStorage[endBoardIdx])
+    );
+  }
+
+  // Dropped Element Event Listeners
+  droppedItem
+    .getElementsByClassName('btn remove')[0]
+    .addEventListener(
+      'click',
+      removeTaskElement.bind(null, endBoardIdx, droppedItemIdx + 1, droppedItem)
+    );
+
+  droppedItem
+    .getElementsByClassName('btn edit')[0]
+    .addEventListener('click', editTaskInput.bind(null, droppedItem));
+
+  const input = droppedItem.getElementsByClassName('input')[0];
+
+  input.addEventListener(
+    'blur',
+    disabledOnBlur.bind(null, input, endBoardIdx, droppedItemIdx + 1 || 0)
   );
+
+  draggedItem.remove();
 }
 // Adding Event Listeners
 function dragDropEvents(board) {
@@ -129,8 +205,6 @@ function dragDropEvents(board) {
 
   // Dropping
   boardList.addEventListener('drop', (e) => {
-    let endBoardIdx;
-    let droppedItemIdx;
     let droppedItem;
     let draggedItem = boardsArr[startBoardIdx]
       .getElementsByTagName('ul')[0]
@@ -185,7 +259,6 @@ function dragDropEvents(board) {
         liEl.insertAdjacentElement('afterend', droppedItem);
       } else if (e.target.tagName === 'UL') {
         // Append li to List
-        console.log('UL');
         e.target.append(droppedItem);
 
         // Update Local Storage
@@ -217,21 +290,14 @@ function dragDropEvents(board) {
         .addEventListener('click', editTaskInput.bind(null, droppedItem));
 
       const input = droppedItem.getElementsByClassName('input')[0];
-      console.log(droppedItemIdx);
-
       input.addEventListener(
         'blur',
         disabledOnBlur.bind(null, input, endBoardIdx, droppedItemIdx + 1 || 0)
       );
-
-      console.log(boardsStorage[endBoardIdx]);
     }
   });
 }
 
-function print() {
-  console.log(this);
-}
 // Enabling drag and drop on touch devices
 function dragDropTouchEvents(board) {
   const boardList = board.getElementsByClassName('list')[0];
@@ -239,16 +305,81 @@ function dragDropTouchEvents(board) {
   boardList.addEventListener('touchstart', dragStart);
 
   board.addEventListener('touchend', (e) => {
-    console.log(e);
-    console.log('end');
+    if (
+      (endBoardIdx >= 0 && endBoardIdx !== startBoardIdx) ||
+      droppedItemIdx !== draggedItemIdx
+    ) {
+      // console.log(endBoardIdx, droppedItemIdx);
+      if (droppedItemIdx >= 0) {
+        touchDrop('INPUT');
+      } else {
+        touchDrop('UL');
+      }
+    }
   });
 
   board.addEventListener('touchmove', (e) => {
-    console.log(e.changedTouches);
-    const liEls = [...document.querySelectorAll('li')];
-    if (e.changedTouches[0].target.tagName === 'INPUT') {
-      liEls.forEach((li) => li.classList.remove('over'));
-      e.changedTouches[0].target.closest('li').classList.add('over');
+    e.preventDefault();
+    const currY = e.changedTouches[0].clientY;
+    const currX = e.changedTouches[0].clientX;
+    // console.log(e.changedTouches[0].clientY);
+
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+    // console.log(scrollTop, clientHeight);
+    // console.log(Math.abs((scrollHeight - scrollTop) % clientHeight));
+    // console.log(
+    //   Math.abs(clientHeight - (scrollTop % clientHeight)) >= clientHeight - 60
+    // );
+    if (currY + 40 >= clientHeight) {
+      window.scrollBy({
+        top: 20,
+        behavior: 'smooth',
+      });
+    } else if (currY <= 40) {
+      window.scrollBy({
+        top: -20,
+        behavior: 'smooth',
+      });
+    }
+
+    // Calculting lists dimensions
+    const rects = [];
+    const lists = [...document.getElementsByTagName('ul')];
+    lists.forEach((list) => rects.push(list.getBoundingClientRect()));
+
+    // Current list Idx
+    const idx = rects.findIndex((rect) => {
+      return (
+        currY >= rect.top &&
+        currY <= rect.bottom &&
+        currX >= rect.left &&
+        currY <= rect.right
+      );
+    });
+
+    let liEls;
+    // Current li Idx
+    let liIdx;
+    if (idx >= 0) {
+      liEls = [...lists[idx].getElementsByTagName('li')];
+      liIdx = liEls.findIndex((el) => {
+        const { top, bottom } = el.getBoundingClientRect();
+        return currY >= top && currY <= bottom + 10;
+      });
+    }
+
+    // console.log(idx, liIdx);
+    const allLis = [...document.getElementsByTagName('li')];
+
+    // console.log(liIdx);
+    if (e.target.tagName === 'INPUT') {
+      if (liIdx !== droppedItemIdx) {
+        endBoardIdx = idx;
+        droppedItemIdx = liIdx;
+        allLis.forEach((li) => li.classList.remove('over'));
+        if (liIdx >= 0) liEls[liIdx].classList.add('over');
+      }
     }
   });
 }

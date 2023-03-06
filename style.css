@@ -99,7 +99,7 @@ li.over::after {
 
 .input:focus {
   outline: transparent;
-  border: 2px inset #0026ff;
+  border-bottom: 2px inset rgb(68, 68, 228);
 }
 
 .btn {
@@ -154,5 +154,9 @@ li.over::after {
   }
   body {
     padding: 1rem;
+  }
+
+  .list {
+    padding-top: 2rem;
   }
 }
