@@ -99,7 +99,7 @@ li.over::after {
 
 .input:focus {
   outline: transparent;
-  border: 3px inset #88edff;
+  border: 2px inset #7bff00d2;
 }
 
 .btn {
