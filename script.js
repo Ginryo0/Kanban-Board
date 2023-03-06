@@ -305,19 +305,27 @@ function dragDropTouchEvents(board) {
   boardList.addEventListener('touchstart', dragStart);
 
   board.addEventListener('touchend', (e) => {
-    if (
-      endBoardIdx >= 0 &&
-      (endBoardIdx !== startBoardIdx || droppedItemIdx !== draggedItemIdx)
-    ) {
-      // console.log(endBoardIdx, droppedItemIdx);
-      if (droppedItemIdx >= 0) {
-        touchDrop('INPUT');
-      } else {
-        touchDrop('UL');
+    if (e.target.tagName === 'INPUT') {
+      if (
+        endBoardIdx >= 0 &&
+        (endBoardIdx !== startBoardIdx || droppedItemIdx !== draggedItemIdx)
+      ) {
+        // console.log(endBoardIdx, droppedItemIdx);
+        if (droppedItemIdx >= 0) {
+          touchDrop('INPUT');
+        } else {
+          touchDrop('UL');
+        }
       }
     }
   });
 
+  board.addEventListener('touchcancel', () => {
+    startBoardIdx = null;
+    draggedItemIdx = null;
+    droppedItemIdx = null;
+    endBoardIdx = null;
+  });
   board.addEventListener('touchmove', (e) => {
     // console.log(e.changedTouches[0].target.tagName === 'INPUT');
     if (e.changedTouches[0].target.tagName === 'INPUT') {
