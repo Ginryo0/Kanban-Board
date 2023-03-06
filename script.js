@@ -92,7 +92,6 @@ function dragStart(e) {
     targ = e.target;
   } else if (e.target.tagName === 'INPUT') {
     targ = e.target.closest('li');
-    // console.log(targ);
   }
 
   if (targ) {
@@ -115,7 +114,6 @@ function touchDrop(target) {
     lists[startBoardIdx].getElementsByTagName('li')[draggedItemIdx];
 
   let droppedItem = draggedItem.cloneNode(true);
-  // console.log(droppedItem);
 
   boardsStorage[startBoardIdx].splice(draggedItemIdx, 1);
 
@@ -323,28 +321,15 @@ function dragDropTouchEvents(board) {
     }
   });
 
-  // board.addEventListener('touchcancel', () => {
-  //   startBoardIdx = null;
-  //   draggedItemIdx = null;
-  //   droppedItemIdx = null;
-  //   endBoardIdx = null;
-  // });
   board.addEventListener('touchmove', (e) => {
-    // console.log(e.changedTouches[0].target.tagName === 'INPUT');
     if (e.changedTouches[0].target.tagName === 'INPUT') {
       e.preventDefault();
       const currY = e.changedTouches[0].clientY;
       const currX = e.changedTouches[0].clientX;
-      // console.log(e.changedTouches[0].clientY);
 
       const { scrollTop, scrollHeight, clientHeight } =
         document.documentElement;
 
-      // console.log(scrollTop, clientHeight);
-      // console.log(Math.abs((scrollHeight - scrollTop) % clientHeight));
-      // console.log(
-      //   Math.abs(clientHeight - (scrollTop % clientHeight)) >= clientHeight - 60
-      // );
       if (currY + 40 >= clientHeight) {
         window.scrollBy({
           top: 20,
@@ -388,8 +373,6 @@ function dragDropTouchEvents(board) {
         });
       }
 
-      console.log(liIdx);
-      // console.log(idx, liIdx);
       const allLis = [...document.getElementsByTagName('li')];
 
       // console.log(liIdx);
