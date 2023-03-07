@@ -11,6 +11,7 @@ const boardsStorage = [nsBoard, ipBoard, cmpBoard];
 
 let startBoardIdx;
 let draggedItemIdx;
+let draggedItem;
 
 let endBoardIdx;
 let droppedItemIdx;
@@ -100,6 +101,9 @@ function dragStart(e) {
     draggedItemIdx = [...e.currentTarget.getElementsByTagName('li')].findIndex(
       (el) => el === targ
     );
+
+    draggedItem =
+      lists[startBoardIdx].getElementsByTagName('li')[draggedItemIdx];
   }
 }
 
@@ -110,8 +114,7 @@ function touchDrop(target) {
       li.classList.remove('over')
     )
   );
-  let draggedItem =
-    lists[startBoardIdx].getElementsByTagName('li')[draggedItemIdx];
+  draggedItem = lists[startBoardIdx].getElementsByTagName('li')[draggedItemIdx];
 
   let droppedItem = draggedItem.cloneNode(true);
 
@@ -307,6 +310,8 @@ function dragDropTouchEvents(board) {
   boardList.addEventListener('touchstart', dragStart);
 
   board.addEventListener('touchend', (e) => {
+    console.log(e.target);
+
     if (e.target.tagName === 'INPUT') {
       if (
         endBoardIdx >= 0 &&
@@ -324,18 +329,20 @@ function dragDropTouchEvents(board) {
   board.addEventListener('touchmove', (e) => {
     if (e.changedTouches[0].target.tagName === 'INPUT') {
       e.preventDefault();
+
       const currY = e.changedTouches[0].clientY;
       const currX = e.changedTouches[0].clientX;
 
-      const { scrollTop, scrollHeight, clientHeight } =
-        document.documentElement;
+      console.log(e.target.style.top, currY);
 
-      if (currY + 100 >= clientHeight) {
+      const { clientHeight } = document.documentElement;
+      // console.log(currY);
+      if (currY + 250 >= clientHeight) {
         window.scrollBy({
           top: 50,
           behavior: 'smooth',
         });
-      } else if (currY <= 100) {
+      } else if (currY <= 250) {
         window.scrollBy({
           top: -50,
           behavior: 'smooth',
@@ -349,8 +356,8 @@ function dragDropTouchEvents(board) {
 
       // Current list Idx
       const idx = rects.findIndex((rect) => {
-        console.log(currX, currY);
-        console.log(rect);
+        // console.log(currX, currY);
+        // console.log(rect);
         return (
           currY >= rect.top &&
           currY <= rect.bottom &&
