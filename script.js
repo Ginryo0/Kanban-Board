@@ -195,6 +195,11 @@ function dragDropEvents(board) {
     const target = e.target;
     if (e.target.tagName === 'INPUT') {
       target.closest('li').classList.add('over');
+    } else if (
+      e.target.tagName === 'UL' &&
+      !e.target.getElementsByTagName('li').length
+    ) {
+      target.classList.add('over');
     }
   });
 
@@ -203,6 +208,8 @@ function dragDropEvents(board) {
     const target = e.target;
     if (target.tagName === 'INPUT') {
       target.closest('li').classList.remove('over');
+    } else if (e.target.tagName === 'UL') {
+      target.classList.remove('over');
     }
   });
 
@@ -268,7 +275,7 @@ function dragDropEvents(board) {
       } else if (e.target.tagName === 'UL') {
         // Append li to List
         e.target.append(droppedItem);
-
+        e.target.classList.remove('over');
         // Update Local Storage
         boardsStorage[endBoardIdx].push(
           droppedItem.getElementsByClassName('input')[0].value
@@ -315,11 +322,13 @@ function dragDropTouchEvents(board) {
   board.addEventListener('touchend', (e) => {
     if (e.target.tagName === 'INPUT') {
       draggedItem.classList.remove('dragged');
+      // draggedItem.style.position = 'fixed';
 
       if (
         endBoardIdx >= 0 &&
         (endBoardIdx !== startBoardIdx || droppedItemIdx !== draggedItemIdx)
       ) {
+        lists[endBoardIdx].classList.remove('over');
         if (droppedItemIdx >= 0) {
           touchDrop('INPUT');
         } else {
@@ -329,12 +338,27 @@ function dragDropTouchEvents(board) {
     }
   });
 
+  // board.addEventListener('touchmove', (e) => {
+  //   if (e.changedTouches[0].target.tagName === 'INPUT') {
+  //     e.preventDefault();
+  //     const currY = e.touches[0].pageY;
+  //     const currX = e.touches[0].pageX;
+  //     // console.log(C);
+  //     draggedItem.style.top = currY + 'px';
+  //     draggedItem.style.left = currX + 'px';
+  //     console.log('moving');
+  //   }
+  // });
+
   board.addEventListener('touchmove', (e) => {
     if (e.changedTouches[0].target.tagName === 'INPUT') {
       e.preventDefault();
-
+      // console.log(e.changedTouches[0]);
       const currY = e.changedTouches[0].clientY;
       const currX = e.changedTouches[0].clientX;
+      // draggedItem.style.top = currY + 'px';
+      // draggedItem.style.left = currX + 'px';
+      // console.log(currY, draggedItem.style.top);
 
       const { clientHeight } = document.documentElement;
       if (currY >= clientHeight * 0.75) {
@@ -368,6 +392,9 @@ function dragDropTouchEvents(board) {
       // Current li Idx
       let liIdx;
       if (idx >= 0) {
+        if (endBoardIdx && endBoardIdx !== idx) {
+          lists[endBoardIdx].classList.remove('over');
+        }
         endBoardIdx = idx;
         liEls = [...lists[idx].getElementsByTagName('li')];
 
@@ -383,11 +410,15 @@ function dragDropTouchEvents(board) {
         if (liIdx !== droppedItemIdx) {
           allLis.forEach((li) => li.classList.remove('over'));
           droppedItemIdx = liIdx;
-          if (
-            liIdx >= 0 &&
-            (startBoardIdx !== endBoardIdx || liIdx !== draggedItemIdx)
-          ) {
-            liEls[liIdx].classList.add('over');
+          if (startBoardIdx !== endBoardIdx || liIdx !== draggedItemIdx) {
+            if (liIdx >= 0) {
+              lists[endBoardIdx].classList.remove('over');
+              liEls[liIdx].classList.add('over');
+            } else {
+              // startBoardIdx !== endBoardIdx &&
+              !lists[endBoardIdx].getElementsByTagName('li').length &&
+                lists[endBoardIdx].classList.add('over');
+            }
           }
         }
       }
@@ -404,7 +435,6 @@ function app() {
     const oldBoard = boardsStorage[i];
 
     // Selecting DOM elements
-    const boardList = board.getElementsByClassName('list')[0];
     const addBtn = board.getElementsByClassName('btn btn--big')[0];
 
     // Rednering Stored Board
