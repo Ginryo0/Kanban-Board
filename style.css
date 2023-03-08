@@ -87,6 +87,10 @@ li.over::after {
   transition: all 0.15s ease-in;
 }
 
+li.dragged {
+  opacity: 60%;
+}
+
 .input {
   background-color: white;
   color: #000;
@@ -157,6 +161,6 @@ li.over::after {
   }
 
   .list {
-    padding-top: 4rem;
+    padding-top: 2rem;
   }
 }

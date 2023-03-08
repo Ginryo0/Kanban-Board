@@ -1,6 +1,5 @@
-const boards = document.getElementsByClassName('board');
+const boardsArr = [...document.getElementsByClassName('board')];
 const lists = [...document.getElementsByTagName('ul')];
-const boardsArr = [...boards];
 const boardsShort = ['ns', 'ip', 'cmp'];
 
 const nsBoard = JSON.parse(localStorage.getItem('ns')) || [];
@@ -21,7 +20,6 @@ function disabledOnBlur(input, listNum, liNum) {
   input.disabled = true;
   const boardStore = boardsStorage[listNum];
   boardStore[liNum] = input.value;
-  // console.log(liNum, boardStore);
   localStorage.setItem(boardsShort[listNum], JSON.stringify(boardStore));
 }
 
@@ -104,6 +102,8 @@ function dragStart(e) {
 
     draggedItem =
       lists[startBoardIdx].getElementsByTagName('li')[draggedItemIdx];
+
+    draggedItem.classList.add('dragged');
   }
 }
 
@@ -116,6 +116,7 @@ function touchDrop(target) {
   );
   draggedItem = lists[startBoardIdx].getElementsByTagName('li')[draggedItemIdx];
 
+  draggedItem.classList.remove('dragged');
   let droppedItem = draggedItem.cloneNode(true);
 
   boardsStorage[startBoardIdx].splice(draggedItemIdx, 1);
@@ -126,7 +127,6 @@ function touchDrop(target) {
   );
 
   if (target === 'INPUT') {
-    console.log(droppedItemIdx);
     let liEl = lists[endBoardIdx].getElementsByTagName('li')[droppedItemIdx];
     boardsStorage[endBoardIdx].splice(
       droppedItemIdx + 1,
@@ -144,8 +144,6 @@ function touchDrop(target) {
     liEl.insertAdjacentElement('afterend', droppedItem);
   } else if (target === 'UL') {
     // Append li to List
-    console.log(endBoardIdx);
-    console.log(lists[endBoardIdx]);
     lists[endBoardIdx].append(droppedItem);
 
     // Update Local Storage
@@ -208,13 +206,18 @@ function dragDropEvents(board) {
     }
   });
 
+  // Drag end
+  boardList.addEventListener('dragend', () => {
+    draggedItem.classList.remove('dragged');
+  });
+
   // Dropping
   boardList.addEventListener('drop', (e) => {
     let droppedItem;
-    let draggedItem = boardsArr[startBoardIdx]
-      .getElementsByTagName('ul')[0]
-      .getElementsByTagName('li')[draggedItemIdx];
-
+    // let draggedItem = boardsArr[startBoardIdx]
+    //   .getElementsByTagName('ul')[0]
+    //   .getElementsByTagName('li')[draggedItemIdx];
+    draggedItem.classList.remove('dragged');
     let liEl;
 
     // Removing hover class
@@ -310,9 +313,9 @@ function dragDropTouchEvents(board) {
   boardList.addEventListener('touchstart', dragStart);
 
   board.addEventListener('touchend', (e) => {
-    console.log(e.target);
-
     if (e.target.tagName === 'INPUT') {
+      draggedItem.classList.remove('dragged');
+
       if (
         endBoardIdx >= 0 &&
         (endBoardIdx !== startBoardIdx || droppedItemIdx !== draggedItemIdx)
@@ -333,18 +336,15 @@ function dragDropTouchEvents(board) {
       const currY = e.changedTouches[0].clientY;
       const currX = e.changedTouches[0].clientX;
 
-      console.log(e.target.style.top, currY);
-
       const { clientHeight } = document.documentElement;
-      // console.log(currY);
-      if (currY + 250 >= clientHeight) {
+      if (currY >= clientHeight * 0.75) {
         window.scrollBy({
-          top: 50,
+          top: clientHeight * 0.05,
           behavior: 'smooth',
         });
-      } else if (currY <= 250) {
+      } else if (currY <= clientHeight * 0.25) {
         window.scrollBy({
-          top: -50,
+          top: -clientHeight * 0.05,
           behavior: 'smooth',
         });
       }
@@ -356,8 +356,6 @@ function dragDropTouchEvents(board) {
 
       // Current list Idx
       const idx = rects.findIndex((rect) => {
-        // console.log(currX, currY);
-        // console.log(rect);
         return (
           currY >= rect.top &&
           currY <= rect.bottom &&
@@ -372,9 +370,8 @@ function dragDropTouchEvents(board) {
       if (idx >= 0) {
         endBoardIdx = idx;
         liEls = [...lists[idx].getElementsByTagName('li')];
-        console.log(lists[idx].getElementsByTagName('li'));
+
         liIdx = liEls.findIndex((el) => {
-          console.log(el);
           const { top, bottom } = el.getBoundingClientRect();
           return currY >= top && currY <= bottom + 10;
         });
@@ -382,7 +379,6 @@ function dragDropTouchEvents(board) {
 
       const allLis = [...document.getElementsByTagName('li')];
 
-      // console.log(liIdx);
       if (e.target.tagName === 'INPUT') {
         if (liIdx !== droppedItemIdx) {
           allLis.forEach((li) => li.classList.remove('over'));
@@ -415,7 +411,7 @@ function app() {
     if (oldBoard.length > 0) {
       for (let j = 0; j < oldBoard.length; j++) {
         const text = oldBoard[j];
-        const newTask = createTaskEl(i, j, text);
+        createTaskEl(i, j, text);
       }
     }
 
