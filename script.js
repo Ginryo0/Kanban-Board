@@ -11,7 +11,7 @@ const boardsStorage = [nsBoard, ipBoard, cmpBoard];
 let startBoardIdx;
 let draggedItemIdx;
 let draggedItem;
-
+let hoverTarget;
 let endBoardIdx;
 let droppedItemIdx;
 
@@ -193,12 +193,9 @@ function dragDropEvents(board) {
   // Drag Enter
   boardList.addEventListener('dragenter', (e) => {
     const target = e.target;
-    if (e.target.tagName === 'INPUT') {
+    if (target.tagName === 'INPUT') {
       target.closest('li').classList.add('over');
-    } else if (
-      e.target.tagName === 'UL' &&
-      !e.target.getElementsByTagName('li').length
-    ) {
+    } else if (target.tagName === 'UL') {
       target.classList.add('over');
     }
   });
@@ -208,7 +205,7 @@ function dragDropEvents(board) {
     const target = e.target;
     if (target.tagName === 'INPUT') {
       target.closest('li').classList.remove('over');
-    } else if (e.target.tagName === 'UL') {
+    } else if (target.tagName === 'UL') {
       target.classList.remove('over');
     }
   });
@@ -221,9 +218,6 @@ function dragDropEvents(board) {
   // Dropping
   boardList.addEventListener('drop', (e) => {
     let droppedItem;
-    // let draggedItem = boardsArr[startBoardIdx]
-    //   .getElementsByTagName('ul')[0]
-    //   .getElementsByTagName('li')[draggedItemIdx];
     draggedItem.classList.remove('dragged');
     let liEl;
 
@@ -274,10 +268,12 @@ function dragDropEvents(board) {
         liEl.insertAdjacentElement('afterend', droppedItem);
       } else if (e.target.tagName === 'UL') {
         // Append li to List
-        e.target.append(droppedItem);
+        e.target.insertAdjacentElement('afterbegin', droppedItem);
         e.target.classList.remove('over');
         // Update Local Storage
-        boardsStorage[endBoardIdx].push(
+        boardsStorage[endBoardIdx].splice(
+          0,
+          0,
           droppedItem.getElementsByClassName('input')[0].value
         );
 
