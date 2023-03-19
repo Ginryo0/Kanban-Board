@@ -40,7 +40,7 @@ h1 {
 }
 
 h2 {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
   font-size: 2.5rem;
   font-weight: 400;
 }
@@ -53,19 +53,27 @@ h2 {
 .list {
   list-style: none;
   display: flex;
-  min-height: 2rem;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-
-  /* gap: 1rem; */
-  /* padding-bottom: 1rem; */
+  padding-top: 2rem;
+  position: relative;
 }
 
 .list.over {
-  background-color: rgba(0, 0, 0, 0.212);
+  padding-top: 3.5rem;
+}
+
+.list.over::before {
+  content: '';
   border-radius: 5px;
-  margin-bottom: 0.5rem;
+  width: 100%;
+  height: 2rem;
+  background-color: rgba(0, 0, 0, 0.212);
+  display: block;
+  position: absolute;
+  top: 1rem;
+  transition: all 0.05s ease-in;
 }
 
 .list li {
@@ -73,7 +81,7 @@ h2 {
   margin-bottom: 1rem;
   width: 100%;
   z-index: 1;
-  transition: all 0.15s ease-in;
+  transition: all 0.1s ease-in;
 }
 
 li .btn:hover {
@@ -81,17 +89,19 @@ li .btn:hover {
 }
 
 li.over {
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
 }
 
 li.over::after {
   content: '';
+  border-radius: 5px;
   width: 100%;
   height: 2rem;
   background-color: rgba(0, 0, 0, 0.212);
   display: block;
   position: absolute;
-  transition: all 0.15s ease-in;
+  top: 3rem;
+  transition: all 0.05s ease-in;
 }
 
 li.dragged {
